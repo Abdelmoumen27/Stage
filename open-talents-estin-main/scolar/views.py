@@ -8398,12 +8398,53 @@ class PublicEnseignantListView(TemplateView):
         context['titre'] = 'Liste des enseignants'
         
         return context
+class TlEnseignantListView(TemplateView): 
+    template_name = 'scolar/tl_filter_list.html'
+
+    def get_queryset(self, **kwargs):
+        return Enseignant.objects.filter(public_profile=True).order_by('nom', 'prenom')
+
+    def get_context_data(self, **kwargs):
+        context = super(TlEnseignantListView, self).get_context_data(**kwargs)
+        filter_ = EnseignantFilter(self.request.GET, queryset=self.get_queryset(**kwargs))
+        filter_.form.helper = FormHelper()
+        private=False
+        if not self.request.user.is_authenticated:
+            private=True
+        else :
+            private= not self.request.user.has_perm('scolar.fonctionnalite_enseignants_visualisationsensible') 
+        exclude_=[]
+        if private:
+            exclude_.append('tel') 
+        exclude_.append('edt')
+        exclude_.append('bal')
+        exclude_.append('eps')
+        exclude_.append('edit')
+        exclude_.append('situation')
+        exclude_.append('admin') 
+        table = EnseignantTable(filter_.qs, exclude=exclude_)
+        RequestConfig(self.request).configure(table)
+        context['filter'] = filter_
+        context['table'] = table
+        context['back'] = reverse('home')
+        
+        context['titre'] = 'Liste des enseignants qui ont valider leurs temps libres'
+        
+        return context
     
 class EnseignantEDTView(TemplateView):
     template_name='scolar/enseignant_edt.html'
 
     def get_context_data(self, **kwargs):
         context=super(EnseignantEDTView, self).get_context_data(**kwargs)
+        enseignant_=get_object_or_404(Enseignant, id=self.kwargs.get('enseignant_pk'))
+        context['enseignant']=enseignant_
+        return context   
+class EnseignantTLView(TemplateView):
+    template_name='scolar/enseignant_tl.html'
+
+    def get_context_data(self, **kwargs):
+        context=super(EnseignantTLView, self).get_context_data(**kwargs)
         enseignant_=get_object_or_404(Enseignant, id=self.kwargs.get('enseignant_pk'))
         context['enseignant']=enseignant_
         return context   

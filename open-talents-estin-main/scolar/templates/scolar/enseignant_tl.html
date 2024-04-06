@@ -1,0 +1,34 @@
+{% extends 'scolar/index.html' %}
+{% load django_tables2 crispy_forms_tags icons %}
+{% block content %}
+	
+<select name="grade" class="select form-control is-valid" title="" id="id_grade">
+    <option value="" selected="">Jour</option>
+  
+    <option value="">---</option>
+  
+    <option value="Dimanche">Dimanche</option>
+  
+    <option value="Lundi">Lundi</option>
+  
+    <option value="Mardi">Mardi</option>
+  
+    <option value="Mercredi">Mercredi</option>
+  
+    <option value="Jeudi">Jeudi</option>
+  
+  
+</select>
+<br>
+<select name="grade" class="select form-control is-valid" title="" id="id_grade">
+    <option value="">----</option>
+    <option value="Debut">Debut</option>
+  
+    <option value="fin">fin</option>
+  
+  
+</select>
+<br>
+<a href="" class="btn btn-primary"> Sauvegarder </a>
+    
+{% endblock %}

@@ -4,7 +4,7 @@
 <style>
 .btn-sidebar {
 	width:100%;
-    background-color: {{institution.color}} !important;
+    
 	font-weight: bold;
 	margin-top:10px;
 	text-align:left;
@@ -12,9 +12,9 @@
 
 .btn-sidebar:hover {
 	width:100%;
-    background-color: {{institution.color}}90 !important;
+    
 	font-weight: bold;
-	text-aligh:left;
+	text-align:left;
 }
 
 .nombre-offres{
@@ -47,6 +47,7 @@
 					{% if institution.activation_google_agenda %}
 				  		<a class="dropdown-item" href="{% url "enseignant_edt" enseignant_pk=request.user.enseignant.id %}  ">{% icon 'calendar' %} Mon EDT</a>
 					{% endif %}
+					<a class="dropdown-item" href="{% url "enseignant_tl" enseignant_pk=request.user.enseignant.id %}  " >{% icon 'calendar' %} Mon temps libre</a>
 				  </div>
 				</li>
 				{% endif %}
@@ -256,6 +257,7 @@
 				<button class="btn btn-primary btn-sidebar" data-toggle="collapse" data-target="#menu_enseignants">{% icon 'fa fa-user-friends' %} Enseignants</button>
 			</li>
 			<div id="menu_enseignants" class="collapse">
+				
 				<li class="list-group-item">
 				  <a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'user-friends' %} Annuaire</a>
 				  <div class="dropdown-menu">
@@ -282,7 +284,11 @@
 				<li>
 					<a class="list-group-item" href="{% url "charge_list" %}">{% icon 'balance-scale' %} Charges</a>
 				</li>
-			{% endif %}
+				{% endif %}
+				<li>
+					<a class="list-group-item" href="{% url "tl_enseignant_list" %}">{% icon 'calendar' %} Temps libre</a>
+				</li>
+			
 			</div>
 		</ul>
 
