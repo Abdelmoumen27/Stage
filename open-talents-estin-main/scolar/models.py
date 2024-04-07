@@ -3359,3 +3359,32 @@ class Candidature(models.Model):
     
     def __str__(self):
         return f"{self.user} : {self.offre}"
+
+
+
+
+#stage models
+
+class EDTStartChoices(models.Model):
+    enseignant = models.ForeignKey(Enseignant, on_delete=models.CASCADE, null=False, blank=True)
+    journe_libre = models.IntegerField(verbose_name='Journe libre')
+    debut = models.BooleanField()
+    fin = models.BooleanField()
+    validated = models.BooleanField(default=False)
+    
+    def clean(self):
+        super.clean()
+        if self.debut == self.fin:
+            raise ValidationError('Debut and Fin cannot be both checked')
+        if self.journe_libre < 1 or self.journe_libre > 5:
+            raise ValidationError('A day must be in the range of Sunday to Thursday')
+        
+        return
+
+
+
+
+
+
+
+

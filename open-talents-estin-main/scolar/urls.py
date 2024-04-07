@@ -549,6 +549,7 @@ urlpatterns = [
     re_path(r'^googlecalendar_update/(?P<pk>\d+)/$', views.GoogleCalendarUpdateView.as_view(), name='googlecalendar_update'),
     re_path(r'^googlecalendar_delete/(?P<pk>\d+)/$', views.GoogleCalendarDeleteView.as_view(), name='googlecalendar_delete'),
 
-
+    # Stage urls
+    path('start_edt/<int:pk>', views.EnseignantEDTChoice.as_view(), name='starter_edt'),
 
 ]

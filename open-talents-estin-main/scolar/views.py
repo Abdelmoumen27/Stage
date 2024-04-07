@@ -618,7 +618,7 @@ def authorize_from_fet_to_google_agenda(request):
         prompt='consent',
         include_granted_scopes='false')
     return redirect(authorization_url)
-    
+
         
 def callback_from_fet_to_google_agenda(request):
     # if this is a POST request we need to process the form data
@@ -8401,7 +8401,7 @@ class PublicEnseignantListView(TemplateView):
     
 class EnseignantEDTView(TemplateView):
     template_name='scolar/enseignant_edt.html'
-
+    
     def get_context_data(self, **kwargs):
         context=super(EnseignantEDTView, self).get_context_data(**kwargs)
         enseignant_=get_object_or_404(Enseignant, id=self.kwargs.get('enseignant_pk'))
@@ -23174,3 +23174,82 @@ class GoogleCalendarDeleteView(LoginRequiredMixin, SuccessMessageMixin, Permissi
  
     def get_success_url(self):
         return reverse('googlecalendar_list')   
+
+
+
+
+# stage views 
+
+
+from django.views import View
+
+
+class EDTChoisesManagementView(View):
+    def get(self, request):
+        section_activated = None
+        edt_list = EDTStartChoices.objects.get()
+        
+        template_name = ''
+        context = {
+            'section_is_on':section_activated,
+            'EDT_data': edt_list
+            }
+        return render(template_name, context=context)
+
+
+    def post(self, request):
+        section_activated = None
+        if section_activated:
+            edt_choice_id = request['body']['edt_choice']
+            validated = request['body']['validated']        
+            edt_choice = EDTStartChoices.objects.get(id = edt_choice_id)
+            if validated:
+                edt_choice.validated = validated
+                edt.save()
+                # email = ''
+            else:
+                edt.delete()
+                # email = ''
+            # send_email_to(admin.email, email)
+            url = reverse('')
+            return redirect(url)
+
+        else:
+            # set_activation_status()
+            enseignants = Enseignant.objects.all()
+            
+            # email = ''
+            # for enseignant in enseignants:
+            #     send_email_to(enseignant.get_email(), email)
+
+            success_template = ''
+        return render(success_template)
+
+
+
+class EnseignantEDTChoice(View):
+    def get(self,request, pk):
+        template_name = 'scolar/edt_start.html'
+        edt_choice = EDTStartChoices.objects.get(enseignant = pk)
+        context = {'edt_data':edt_choice}
+        return render(template_name , context=context)
+    
+    def post(self, request, enseignant_pk):
+        enseignant = Enseignant.objects.get(user_id = enseignant_pk)
+        journe_libre = request['journee libre']
+        debut = request['debut']
+        fin = request["fin"]
+        edt_choice = EDTStartChoices(
+                            enseignant= enseignant,
+                            journe_libre= journe_libre,
+                            debut = debut,
+                            fin = fin
+                            )
+        edt_choice.save()
+        # email = ''
+        # send_email_to(admin.get_email(), email)
+        success_template = ''
+        return render(success_template)
+
+    
+
