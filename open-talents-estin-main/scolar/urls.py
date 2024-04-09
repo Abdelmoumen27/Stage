@@ -255,6 +255,7 @@ urlpatterns = [
     re_path(r'^seance_rattrapage_create/(?P<activite_pk>\d+)/$',views.SeanceRattrapageCreateView.as_view(), name='seance_rattrapage_create'),
     
     re_path(r'^examen_list/$',views.ExamenListView.as_view(), name='examen_list'),
+    re_path(r'^examen_planning/$',views.ExamenPlanningView.as_view(), name='examen_planning'),
     re_path(r'^pv_examen_list/(?P<seance_pk>\d+)/$',views.PVExamenListView.as_view(), name='pv_examen_list'),
     re_path(r'^examen_etudiant_list/$',views.ExamenEtudiantListView.as_view(), name='examen_etudiant_list'),
     re_path(r'^examen_create/$',views.examen_create_view, name='examen_create'),

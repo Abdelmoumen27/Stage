@@ -12110,6 +12110,12 @@ class ExamenListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         context['titre'] = "Liste des examens"
         return context
 
+class ExamenPlanningView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name='scolar/examen_planning.html'
+    
+    def test_func(self):
+        return self.request.user.has_perm('scolar.fonctionnalitenav_examens_visualisationexamens')
+
 class PlaceEtudiantListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name='scolar/filter_list.html'
     
