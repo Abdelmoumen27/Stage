@@ -460,7 +460,12 @@
 		        	<li>
 						<a class="list-group-item" href="{% url "examen_list" %}">{% icon 'calendar-alt' %} Gérer Examens</a>
 		        	</li>
-				{% endif %}
+					{% endif %}
+				{% if perms.scolar.fonctionnalitenav_examens_visualisationexamens %}
+		        	<li>
+						<a class="list-group-item" href="{% url "examen_planning" %}">{% icon 'calendar-alt' %} Planning D'Examens</a>
+		        	</li>
+					{% endif %}
 				{% if perms.scolar.fonctionnalitenav_examens_visualisationsurveillance or perms.scolar.fonctionnalitenav_examens_visualisationplacesetudiants or perms.scolar.fonctionnalitenav_examens_exportatonlisteplaces %}
 					<li class="list-group-item">
 					  	<a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'arrows-alt-h' %} Répartition</a>
