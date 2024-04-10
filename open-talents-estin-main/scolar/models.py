@@ -3373,13 +3373,17 @@ class EDTStartChoices(models.Model):
     validated = models.BooleanField(default=False)
     
     def clean(self):
-        super.clean()
+        # super.clean()
         if self.debut == self.fin:
             raise ValidationError('Debut and Fin cannot be both checked')
         if self.journe_libre < 1 or self.journe_libre > 5:
             raise ValidationError('A day must be in the range of Sunday to Thursday')
         
         return
+
+
+class ActivationInfo(models.Model):
+    activated = models.BooleanField(default = False)
 
 
 

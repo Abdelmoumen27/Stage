@@ -72,3 +72,7 @@ admin.site.register(Preinscription)
 admin.site.register(Offre)
 admin.site.register(Candidature)
 admin.site.register(InscriptionPeriode)
+
+# stage register
+admin.site.register(EDTStartChoices)
+admin.site.register(ActivationInfo)

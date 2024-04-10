@@ -8398,12 +8398,53 @@ class PublicEnseignantListView(TemplateView):
         context['titre'] = 'Liste des enseignants'
         
         return context
+class TlEnseignantListView(TemplateView): 
+    template_name = 'scolar/tl_filter_list.html'
+
+    def get_queryset(self, **kwargs):
+        return Enseignant.objects.filter(public_profile=True).order_by('nom', 'prenom')
+
+    def get_context_data(self, **kwargs):
+        context = super(TlEnseignantListView, self).get_context_data(**kwargs)
+        filter_ = EnseignantFilter(self.request.GET, queryset=self.get_queryset(**kwargs))
+        filter_.form.helper = FormHelper()
+        private=False
+        if not self.request.user.is_authenticated:
+            private=True
+        else :
+            private= not self.request.user.has_perm('scolar.fonctionnalite_enseignants_visualisationsensible') 
+        exclude_=[]
+        if private:
+            exclude_.append('tel') 
+        exclude_.append('edt')
+        exclude_.append('bal')
+        exclude_.append('eps')
+        exclude_.append('edit')
+        exclude_.append('situation')
+        exclude_.append('admin') 
+        table = EnseignantTable(filter_.qs, exclude=exclude_)
+        RequestConfig(self.request).configure(table)
+        context['filter'] = filter_
+        context['table'] = table
+        context['back'] = reverse('home')
+        
+        context['titre'] = 'Liste des enseignants qui ont valider leurs temps libres'
+        
+        return context
     
 class EnseignantEDTView(TemplateView):
     template_name='scolar/enseignant_edt.html'
     
     def get_context_data(self, **kwargs):
         context=super(EnseignantEDTView, self).get_context_data(**kwargs)
+        enseignant_=get_object_or_404(Enseignant, id=self.kwargs.get('enseignant_pk'))
+        context['enseignant']=enseignant_
+        return context   
+class EnseignantTLView(TemplateView):
+    template_name='scolar/enseignant_tl.html'
+
+    def get_context_data(self, **kwargs):
+        context=super(EnseignantTLView, self).get_context_data(**kwargs)
         enseignant_=get_object_or_404(Enseignant, id=self.kwargs.get('enseignant_pk'))
         context['enseignant']=enseignant_
         return context   
@@ -23182,74 +23223,84 @@ class GoogleCalendarDeleteView(LoginRequiredMixin, SuccessMessageMixin, Permissi
 
 
 from django.views import View
-
+from scolar.tables import EDTStartTable
 
 class EDTChoisesManagementView(View):
     def get(self, request):
-        section_activated = None
-        edt_list = EDTStartChoices.objects.get()
-        
-        template_name = ''
+        section_activated = ActivationInfo.objects.all()[0].activated
+        edt_list = EDTStartChoices.objects.filter(validated = False)
+        edt_table = EDTStartTable(edt_list)
+        template_name = 'scolar/tl_filter_list.html'
         context = {
-            'section_is_on':section_activated,
-            'EDT_data': edt_list
+            'section_is_activated':section_activated,
+            'EDT_data': edt_table
             }
-        return render(template_name, context=context)
+        return render(request, template_name, context=context)
 
 
     def post(self, request):
-        section_activated = None
-        if section_activated:
-            edt_choice_id = request['body']['edt_choice']
-            validated = request['body']['validated']        
-            edt_choice = EDTStartChoices.objects.get(id = edt_choice_id)
-            if validated:
-                edt_choice.validated = validated
-                edt.save()
-                # email = ''
-            else:
-                edt.delete()
-                # email = ''
-            # send_email_to(admin.email, email)
-            url = reverse('')
-            return redirect(url)
-
-        else:
-            # set_activation_status()
-            enseignants = Enseignant.objects.all()
-            
+        # print(request.POST)
+        edt_choice_id = request.GET['edt_id']
+        action = request.GET['action']        
+        edt_choice = EDTStartChoices.objects.get(id = edt_choice_id)
+        # print(edt_choice_id)
+        # print(action)
+        if action == 'validate':
+            edt_choice.validated = True
+            edt_choice.save()
             # email = ''
-            # for enseignant in enseignants:
-            #     send_email_to(enseignant.get_email(), email)
+        elif action == 'refuse':
+            edt_choice.delete()
+            # email = ''
+        # send_email_to(admin.email, email)
+        url = reverse('enseignant_edt_start_list')
+        return redirect(url)
 
-            success_template = ''
-        return render(success_template)
 
-
+daysmap = {"Dimanche":1,"Lundi":2, "Mardi":3,"Mercredi":4, "Jeudi":5}
 
 class EnseignantEDTChoice(View):
-    def get(self,request, pk):
-        template_name = 'scolar/edt_start.html'
-        edt_choice = EDTStartChoices.objects.get(enseignant = pk)
+    def get(self,request, username):
+        template_name = 'scolar/enseignant_tl.html'
+        try:
+            edt_choice = EDTStartChoices.objects.get(enseignant__user__username = username)
+        except ObjectDoesNotExist:
+            edt_choice = None
         context = {'edt_data':edt_choice}
-        return render(template_name , context=context)
+        return render(request, template_name , context=context)
     
-    def post(self, request, enseignant_pk):
-        enseignant = Enseignant.objects.get(user_id = enseignant_pk)
-        journe_libre = request['journee libre']
-        debut = request['debut']
-        fin = request["fin"]
+    def post(self, request, username):
+        enseignant = Enseignant.objects.get(user__username = username)
+        journee_libre = request.POST['journee_libre']
+        journee_libre = daysmap[journee_libre]
+        debut =  request.POST['disponibilite'] == 'Debut'
+        fin = request.POST['disponibilite'] == 'Fin'
         edt_choice = EDTStartChoices(
                             enseignant= enseignant,
-                            journe_libre= journe_libre,
+                            journe_libre= journee_libre,
                             debut = debut,
                             fin = fin
                             )
         edt_choice.save()
         # email = ''
         # send_email_to(admin.get_email(), email)
-        success_template = ''
-        return render(success_template)
+        
+        return redirect('enseignant_start_edt', username = username)
 
     
 
+class EDTStartListActivation(View):
+
+    def post(self, request):
+        activation_code = request.GET['activation']
+        activationInfo = ActivationInfo.objects.all()[0]
+        if not activationInfo.activated and activation_code == 'activate':
+            activationInfo.activated = True
+            activationInfo.save()
+        elif activationInfo.activated and activation_code == 'disactivate':
+            activationInfo.activated = False
+            activationInfo.save()
+
+        url = reverse('enseignant_edt_start_list')
+        return redirect(url)
+    

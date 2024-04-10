@@ -2667,3 +2667,42 @@ class GoogleCalenderTable(tables.Table):
         fields = ('code', 'calendarId')
         template_name= "django_tables2/bootstrap4.html"
         
+
+
+
+
+
+
+
+
+
+
+
+# stage table
+
+
+class EDTStartTable(tables.Table):
+    # action='{% load icons %}\
+    #         <a href="{% url "enseignant_edt" enseignant_pk=record.id %}" > {% icon "calendar-check" %} </a>'
+    # edt=tables.TemplateColumn(action, orderable=False)
+    # action='{% load icons %}\
+    #         {% if perms.scolar.fonctionnalite_enseignants_gestion %}\
+    #             <a href="{% url "enseignant_update" pk=record.id %}"> {% icon "pencil-alt" %} </a>\
+    #         {% endif %}'
+    # edit=tables.TemplateColumn(action, orderable=False)
+    # action='{% load icons %}\
+    #         {% if perms.scolar.fonctionnalite_enseignants_suppression %}\
+    #             <a href="{% url "enseignant_delete" pk=record.id %}"> {% icon "trash" %} </a>\
+    #         {% endif %}'
+    # admin=tables.TemplateColumn(action, orderable=False)
+    # photo=tables.Column()
+    # def render_photo(self,value,record):
+    #     return format_html("<img src='{}' width='80'>",value.url)
+    action= '''<form action="?edt_id={{record.id}}&action=validate" method="post">{% csrf_token %} <button type="submit" class="btn btn-info">validate</button></form>'''
+    validate=tables.TemplateColumn(action, orderable=False)
+    action= '''<form action="?edt_id={{record.id}}&action=refuse" method="post">{% csrf_token %} <button type="submit" class="btn btn-info">refuse</button></form>'''
+    refuse=tables.TemplateColumn(action, orderable=False)
+    class Meta:
+        model = EDTStartChoices
+        # fields = ('nom', 'eps', 'prenom', 'grade', 'situation', 'tel', 'user__email', 'bureau', 'bal')
+        template_name= "django_tables2/bootstrap4.html"

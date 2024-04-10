@@ -1,0 +1,68 @@
+{% extends 'scolar/index.html' %}
+{% load django_tables2 crispy_forms_tags icons %}
+{% block content %}
+<form action="{% url 'enseignant_start_edt' {{enseignant.user.username}} %}" method="POST">	
+    {% csrf_token %}
+    <select name="journee_libre" class="select form-control is-valid" title="" id="id_grade">
+        {%if not edt_data %}
+            <option value= ""  selected >Jour</option>
+        {% else %}
+            <option value="">Jour</option>
+        {% endif %}
+        <!-- <option value="">---</option> -->
+        
+        {%if edt_data and edt_data.journe_libre == 1 %}
+            <option value="Dimanche" selected >Dimanche</option>
+        {% else %}
+            <option value="Dimanche" >Dimanche</option>
+        {% endif %}
+
+        {%if edt_data and edt_data.journe_libre == 2 %}
+            <option value="Lundi" selected >Lundi</option>
+        {% else %}
+            <option value="Lundi" >Lundi</option>
+        {% endif %}
+
+        {%if edt_data and edt_data.journe_libre == 3 %}
+            <option value="Mardi" selected >Mardi</option>
+        {% else %}
+            <option value="Mardi">Mardi</option>
+        {% endif %}
+
+        {%if edt_data and edt_data.journe_libre == 4 %}
+            <option value="Mercredi" selected>Mercredi</option>
+        {% else %}
+            <option value="Mercredi">Mercredi</option>
+        {% endif %}
+
+        {%if edt_data and edt_data.journe_libre == 5 %}
+            <option value="Jeudi" selected >Jeudi</option>
+        {% else %}
+            <option value="Jeudi" >Jeudi</option>
+        {% endif %}
+       
+
+    
+    </select>
+    <br>
+    <select name="disponibilite" class="select form-control is-valid" title="" id="id_grade">
+        <option value="">----</option>
+        {% if edt_data and edt_data.debut%}
+            <option value="Debut" selected>Debut</option>
+        {% else %}
+            <option value="Debut">Debut</option>
+        {% endif %}
+
+        {% if edt_data and edt_data.fin%}
+            <option value="Fin" selected>Fin</option>
+        {% else %}
+            <option value="Fin">Fin</option>
+        {% endif %}
+        
+    
+    
+    </select>
+    <br>
+    <button type="submit" class="btn btn-primary"> Sauvegarder </button>
+</form>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'scolar/index.html' %}
+{% load django_tables2 crispy_forms_tags icons bootstrap4 %}
+{% bootstrap_css %}         {# Embed Bootstrap CSS #}
+{% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
+
+{% block content %}
+	<h1>Temps Libres</h1>
+    <br>
+		{%if not section_is_activated%}
+			<form action="{% url 'edt_start_list_activation' %}?activation=activate" method="post">
+				{% csrf_token %}
+				<button type="submit" class="btn btn-info">Activer</button>
+			</form>
+		{% else %}
+			<form action="{% url 'edt_start_list_activation' %}?activation=disactivate" method="post">
+				{% csrf_token %}
+				<button type='submit' style="background-color: red;" class="btn btn-info">Disactiver</button>
+			</form>
+			<br>
+			{% render_table EDT_data %}
+		{% endif %}
+	<br>
+    	
+{% endblock %}
+	
