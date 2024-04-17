@@ -3386,6 +3386,13 @@ class ActivationInfo(models.Model):
     activated = models.BooleanField(default = False)
 
 
+# class ExamenOrdering(models.Model):
+#     module = models.ForeignKey(Module, on_delete=models.SET_NULL, null=True)
+#     anneeUniv = models.ForeignKey(AnneeUniv, on_delete=models.SET_NULL, null=True)
+#     jour = models.DateField()
+#     heureDebut = models.TimeField()
+#     heureFin = models.TimeField()
+
 
 
 

@@ -51,7 +51,7 @@
 					{% if institution.activation_google_agenda %}
 				  		<a class="dropdown-item" href="{% url "enseignant_edt" enseignant_pk=request.user.enseignant.id %}  ">{% icon 'calendar' %} Mon EDT</a>
 					{% endif %}
-					<a class="dropdown-item" href="{% url 'enseignant_start_edt' enseignant_pk=request.user.enseignant.id %}  " >{% icon 'calendar' %} Mon temps libre</a>
+					<a class="dropdown-item" href="{% url 'enseignant_start_edt' pk=request.user.enseignant.id %}  " >{% icon 'calendar' %} Mon temps libre</a>
 				  </div>
 				</li>
 				{% endif %}
@@ -507,7 +507,7 @@
 					 	<div class="dropdown-menu">
 					  		<a class="dropdown-item" href="{% url "export_pfe_reservation_list" %}">{% icon 'file-excel' %} Liste des Stages Reservés</a>
 					  		{% for annee_univ in annee_univ_list %}
-					  			<a class="dropdown-item" href="{% url "export_pfe_list" annee_univ_pk=annee_univ.annee_univ %}">{% icon 'file-excel' %} Liste des Stages {{ annee_univ }}</a>
+					  			<a class="dropdown-item" href='{% url "export_pfe_list" annee_univ_pk=annee_univ.annee_univ %}''>{% icon 'file-excel' %} Liste des Stages {{ annee_univ }}</a>
 					  		{% endfor %}
 						</div>
 					</li>

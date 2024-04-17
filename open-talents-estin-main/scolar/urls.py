@@ -553,10 +553,12 @@ urlpatterns = [
     re_path(r'^googlecalendar_delete/(?P<pk>\d+)/$', views.GoogleCalendarDeleteView.as_view(), name='googlecalendar_delete'),
 
     # Stage urls
-    path('enseignant_start_edt/<str:username>/', views.EnseignantEDTChoice.as_view(), name='enseignant_start_edt'),
+    path('enseignant_start_edt/<int:pk>/', views.EnseignantEDTChoice.as_view(), name='enseignant_start_edt'),
 
     path('enseignant_edt_start_list/', views.EDTChoisesManagementView.as_view(), name='enseignant_edt_start_list'),
 
     path('enseignant_edt_start_list/activation', views.EDTStartListActivation.as_view(), name='edt_start_list_activation'),
+
+    
 
 ]

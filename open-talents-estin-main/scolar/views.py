@@ -23239,7 +23239,8 @@ class EDTChoisesManagementView(View):
         template_name = 'scolar/tl_filter_list.html'
         context = {
             'section_is_activated':section_activated,
-            'EDT_data': edt_table
+            'EDT_data': edt_table,
+            'request':request
             }
         return render(request, template_name, context=context)
 
@@ -23266,17 +23267,19 @@ class EDTChoisesManagementView(View):
 daysmap = {"Dimanche":1,"Lundi":2, "Mardi":3,"Mercredi":4, "Jeudi":5}
 
 class EnseignantEDTChoice(View):
-    def get(self,request, username):
+    def get(self,request, pk):
         template_name = 'scolar/enseignant_tl.html'
         try:
-            edt_choice = EDTStartChoices.objects.get(enseignant__user__username = username)
+            edt_choice = EDTStartChoices.objects.get(enseignant__id= pk)
         except ObjectDoesNotExist:
             edt_choice = None
-        context = {'edt_data':edt_choice}
+        context = {'edt_data':edt_choice,
+                   'request':request
+                   }
         return render(request, template_name , context=context)
     
-    def post(self, request, username):
-        enseignant = Enseignant.objects.get(user__username = username)
+    def post(self, request, pk):
+        enseignant = Enseignant.objects.get(id = pk)
         journee_libre = request.POST['journee_libre']
         journee_libre = daysmap[journee_libre]
         debut =  request.POST['disponibilite'] == 'Debut'
@@ -23291,7 +23294,7 @@ class EnseignantEDTChoice(View):
         # email = ''
         # send_email_to(admin.get_email(), email)
         
-        return redirect('enseignant_start_edt', username = username)
+        return redirect('enseignant_start_edt', pk = pk)
 
     
 
@@ -23310,3 +23313,35 @@ class EDTStartListActivation(View):
         url = reverse('enseignant_edt_start_list')
         return redirect(url)
     
+
+
+class MyExamenPlanningView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name='scolar/examen_planning.html'
+    # def post(self, request):
+
+    def test_func(self):
+        return self.request.user.has_perm('scolar.fonctionnalitenav_examens_visualisationexamens')
+    
+    
+    def post(self, request):
+        seance_list = request.body['data']
+        seance_id_list =[]
+        new_dates = []
+        for seance_id, new_date in seance_list:
+            seance_id_list.append(seance_id)
+            new_dates.append(new_date)
+
+        seances = Seance.objects.filter(id__in=seance_id_list)
+        for i in range(len(seances)):
+            seances[i].date = new_dates[i]
+            seances[i].save()
+        
+        url = reverse("examen_list")
+        return redirect(url)
+        
+        
+
+
+
+
+# class 
