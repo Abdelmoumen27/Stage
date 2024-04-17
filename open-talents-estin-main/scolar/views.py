@@ -12115,6 +12115,11 @@ class ExamenPlanningView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     
     def test_func(self):
         return self.request.user.has_perm('scolar.fonctionnalitenav_examens_visualisationexamens')
+class ExamenPlanningDragView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name='scolar/examen_planning_drag.html'
+    
+    def test_func(self):
+        return self.request.user.has_perm('scolar.fonctionnalitenav_examens_visualisationexamens')
 
 class PlaceEtudiantListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name='scolar/filter_list.html'
