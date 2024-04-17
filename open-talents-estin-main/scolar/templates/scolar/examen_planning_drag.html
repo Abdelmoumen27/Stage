@@ -1,0 +1,157 @@
+{% extends 'scolar/index.html' %}
+{% load django_tables2 crispy_forms_tags icons bootstrap4 %}
+{% bootstrap_css %}         {# Embed Bootstrap CSS #}
+{% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
+
+{% block content %}
+
+<style>
+  
+  .table {
+    margin-top: 50px;
+    width: 100%; /* Adjust the width as needed */
+    height: 100%;
+    justify-content: start;
+  }
+  .container{
+    justify-content: start;
+  }
+  .table th, .table td {
+    text-align: center;
+  }
+  .draggable, .droppable {
+    cursor: pointer;
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+  }
+  .draggable:hover, .droppable:hover {
+    background-color: #007bff;
+    color: #fff;
+  }
+  .droppable {
+    background-color: #f8f9fa;
+    border: 2px dashed #ced4da;
+    transition: border-color 0.3s;
+  }
+  .droppable:hover {
+    border-color: #007bff;
+  }
+  .save-button {
+    margin-top: 20px;
+    display: none; /* Initially hide the save button */
+  }
+</style>
+
+
+
+<div class="container-fluid"> <!-- Use container-fluid for full-width container -->
+  
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Horraire 1</th>
+            <th>Horraire 2</th>
+            <th>Horraire 3</th>
+            <th>Horraire 4</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="row-number">Dimanche</td>
+            <td class="draggable">Value 1</td>
+            <td class="draggable">Value 2</td>
+            <td class="draggable">Value 3</td>
+            <td class="draggable">Value 4</td>
+          </tr>
+          <tr>
+            <td class="row-number">Lundi</td>
+            <td class="draggable">Value 5</td>
+            <td class="draggable">Value 6</td>
+            <td class="draggable">Value 7</td>
+            <td class="draggable">Value 8</td>
+          </tr>
+          <tr>
+            <td class="row-number">Mardi</td>
+            <td class="draggable">Value 9</td>
+            <td class="draggable">Value 10</td>
+            <td class="draggable">Value 11</td>
+            <td class="draggable">Value 12</td>
+          </tr>
+          <tr>
+            <td class="row-number">Mercredi</td>
+            <td class="draggable">Value 13</td>
+            <td class="draggable">Value 14</td>
+            <td class="draggable">Value 15</td>
+            <td class="draggable">Value 16</td>
+          </tr>
+          <tr>
+            <td class="row-number">Jeudi</td>
+            <td class="draggable">Value 16</td>
+            <td class="draggable">Value 17</td>
+            <td class="draggable">Value 18</td>
+            <td class="draggable">Value 19</td>
+          </tr>
+        </tbody>
+      </table>
+        
+        <div >
+          <a href="{{request.META.HTTP_REFERER}}" class="btn btn-secondary">Retour</a>
+          <a style="color: #fff;" id="save-button" class="btn btn-primary save-button">Sauvegarder</a> <!-- Save button -->
+          </div>
+      
+    
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script>
+  $(function() {
+    var isChanged = false; // Flag to track changes
+
+    $(".draggable").draggable({
+      revert: "invalid",
+      helper: "clone",
+      cursor: "pointer", // Ensure the cursor is set to pointer while dragging
+      drag: function(event, ui) {
+        isChanged = true; // Set the flag to true when dragging occurs
+        $(".save-button").show(); // Show the save button
+      }
+    });
+
+    $("td").droppable({
+      drop: function(event, ui) {
+        var draggable = ui.draggable,
+            droppable = $(this),
+            dragPos = draggable.parent().find("td").index(draggable),
+            dropPos = droppable.parent().find("td").index(droppable);
+
+        // Swap the values
+        var temp = draggable.text();
+        draggable.text(droppable.text());
+        droppable.text(temp);
+
+        isChanged = true; // Set the flag to true when dropping occurs
+        $(".save-button").show(); // Show the save button
+      }
+    });
+
+    // Save button click event
+    $(".save-button").click(function() {
+      if (isChanged) {
+        // Perform save operation here
+        alert("Changes saved!");
+        isChanged = false; // Reset the flag after saving
+        $(".save-button").hide(); // Hide the save button
+      } else {
+        alert("No changes to save.");
+      }
+    });
+  });
+</script>
+
+
+{% endblock %}

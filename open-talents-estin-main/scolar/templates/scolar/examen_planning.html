@@ -20,115 +20,9 @@
 
 
 
-    <a href="/scolar/examen_create/" class="btn btn-info">Créer Examen</a>
-
-    <a href="/scolar/placement_etudiants_examens/" class="btn btn-info">Placement Etudiants</a>
-
-    <a href="/scolar/pv_salle_examen_list/" class="btn btn-info">PV Examen par Salle</a>
-
-    <a href="/scolar/affichage_convocations_examens/" class="btn btn-info">Affichage Répartition</a>
-
-    <a href="/scolar/affichage_reprographie/" class="btn btn-info">Affichage Reprographie</a>
-
-    <a href="/scolar/affichage_surveillance/" class="btn btn-info">Affichage Surveillance</a>
-
-    <a href="/scolar/authorize_envoi_convocations_examens_etudiants/" class="btn btn-info">Envoi Convocations Etudiants</a>
-
-    <a href="/scolar/authorize_envoi_convocations_examens_enseignants/" class="btn btn-info">Envoi Convocations Enseignants</a>
-
 
 <br><br>
-<!--
 
-
-<form  method="post" > <input type="hidden" name="csrfmiddlewaretoken" value="9s8mcVIkfrXyRqyzTVck12yMbk7wlyoeQgo5Uq2sfs9puY6HmeEo3TAw1QWUckFx"> <div id="div_id_annee_univ" class="form-group"> <label for="id_annee_univ" class="">
-        Année Universitaire
-    </label> <div class=""> <select name="annee_univ" class="select form-control" id="id_annee_univ"> <option value="" selected>Année Univ</option> <option value="2023">2023</option>
-
-</select> </div> </div> <div id="div_id_semestre" class="form-group"> <label for="id_semestre" class="">
-        Période
-    </label> <div class=""> <select name="semestre" class="select form-control" id="id_semestre"> <option value="" selected>Période</option> <option value="1">S1</option>
-
-</select> </div> </div> <div id="div_id_formation" class="form-group"> <label for="id_formation" class="">
-        Formation
-    </label> <div class=""> <select name="formation" class="select form-control" id="id_formation"> <option value="" selected>Formation</option> <option value="2">1 2023</option>
-
-</select> </div> </div> <div id="div_id_type" class="form-group"> <label for="id_type" class="">
-        Type
-    </label> <div class=""> <select name="type" class="select form-control" id="id_type"> <option value="" selected>Type</option> <option value="C">Cours</option> <option value="TD">Travail Dirigé</option> <option value="TP">Travail Pratique</option> <option value="P">Projet</option> <option value="E_CI">Contrôle Intermédiaire</option> <option value="E_CF">Contrôle Final</option> <option value="E_CR">Contrôle de Remplacement</option> <option value="E_In">Interrogation</option> <option value="E_TP">Test TP</option> <option value="PFE_Enc">Encadrement PFE</option> <option value="PFE_Sout">Soutenance PFE</option> <option value="Mem_Enc">Encadrement Master</option> <option value="Mem_Sout">Soutenance Master</option> <option value="EQP_Sout">Soutenance Equipe Matière</option>
-
-</select> </div> </div> <div id="div_id_matiere" class="form-group"> <label for="id_matiere" class="">
-        Matière
-    </label> <div class=""> <input type="text" name="matiere" class="textinput textInput form-control" id="id_matiere"> </div> </div> <div id="div_id_surveillant" class="form-group"> <label for="id_surveillant" class="">
-        Surveillant
-    </label> <div class=""> <select name="surveillant" class="select form-control" id="id_surveillant"> <option value="" selected>Surveillant</option> <option value="2">Bourrich Mohamed Reda</option> <option value="1">aa bbb</option>
-
-</select> </div> </div> </form>
-
--->
-<form action="" method="get" class="form form-inline">
-    <input type="hidden" name="csrfmiddlewaretoken" value="9s8mcVIkfrXyRqyzTVck12yMbk7wlyoeQgo5Uq2sfs9puY6HmeEo3TAw1QWUckFx">
-    <div class="form-group is-valid"><label class="sr-only" for="id_annee_univ">Année Universitaire</label><select name="annee_univ" class="select form-control is-valid" title="" id="id_annee_univ">
-<option value="" selected="">Année Univ</option>
-
-<option value="2023">2023</option>
-
-</select></div>
-<div class="form-group is-valid"><label class="sr-only" for="id_semestre">Période</label><select name="semestre" class="select form-control is-valid" title="" id="id_semestre">
-<option value="" selected="">Période</option>
-
-<option value="1">S1</option>
-
-</select></div>
-<div class="form-group is-valid"><label class="sr-only" for="id_formation">Formation</label><select name="formation" class="select form-control is-valid" title="" id="id_formation">
-<option value="" selected="">Formation</option>
-
-<option value="2">1 2023</option>
-
-</select></div>
-<div class="form-group is-valid"><label class="sr-only" for="id_type">Type</label><select name="type" class="select form-control is-valid" title="" id="id_type">
-<option value="" selected="">Type</option>
-
-<option value="C">Cours</option>
-
-<option value="TD">Travail Dirigé</option>
-
-<option value="TP">Travail Pratique</option>
-
-<option value="P">Projet</option>
-
-<option value="E_CI">Contrôle Intermédiaire</option>
-
-<option value="E_CF">Contrôle Final</option>
-
-<option value="E_CR">Contrôle de Remplacement</option>
-
-<option value="E_In">Interrogation</option>
-
-<option value="E_TP">Test TP</option>
-
-<option value="PFE_Enc">Encadrement PFE</option>
-
-<option value="PFE_Sout">Soutenance PFE</option>
-
-<option value="Mem_Enc">Encadrement Master</option>
-
-<option value="Mem_Sout">Soutenance Master</option>
-
-<option value="EQP_Sout">Soutenance Equipe Matière</option>
-
-</select></div>
-<div class="form-group is-valid"><label class="sr-only" for="id_matiere">Matière</label><input type="text" name="matiere" class="textinput textInput form-control is-valid" placeholder="Matière" title="" id="id_matiere"></div>
-<div class="form-group is-valid"><label class="sr-only" for="id_surveillant">Surveillant</label><select name="surveillant" class="select form-control is-valid" title="" id="id_surveillant">
-<option value="" selected="">Surveillant</option>
-
-<option value="2">Bourrich Mohamed Reda</option>
-
-<option value="1">aa bbb</option>
-
-</select></div>
-    <button class="btn btn-primary">Filtrer</button>
-</form>
 
 
 <br>
@@ -207,7 +101,7 @@
                 
                     <td>s1v0, s2v0</td>
                 
-                    <td>            <a href="/scolar/examen_update/4/" class="btn btn-danger"> <i class="fa fa-pencil-alt"></i> Examen </a>            <a href="/scolar/placer_surveillants_update/4/" class="btn btn-warning"> <i class="fa fa-pencil-alt"></i> Surveillants </a>            <a href="/scolar/pv_examen_list/4/ " target="_blank"> PV <i class="fa fa-file-pdf"></i></a>            <a href="/scolar/examen_delete/4/"> <i class="fa fa-trash"></i></a></td>
+                    <td>            <a href="{% url "examen_planning_drag" %}" class="btn btn-primary"> <i class="fa fa-pencil-alt"></i> S1 </a>            <a href="{% url "examen_planning_drag" %}" class="btn btn-primary"> <i class="fa fa-pencil-alt"></i> S2 </a>   </td>
                 
             </tr>
             
@@ -227,7 +121,7 @@
                 
                     <td>s1v0, s2v0</td>
                 
-                    <td>            <a href="/scolar/examen_update/3/" class="btn btn-danger"> <i class="fa fa-pencil-alt"></i> Examen </a>            <a href="/scolar/placer_surveillants_update/3/" class="btn btn-warning"> <i class="fa fa-pencil-alt"></i> Surveillants </a>            <a href="/scolar/pv_examen_list/3/ " target="_blank"> PV <i class="fa fa-file-pdf"></i></a>            <a href="/scolar/examen_delete/3/"> <i class="fa fa-trash"></i></a></td>
+                    <td>            <a href="{% url "examen_planning_drag" %}" class="btn btn-primary"> <i class="fa fa-pencil-alt"></i> S1 </a>            <a href="{% url "examen_planning_drag" %}" class="btn btn-primary"> <i class="fa fa-pencil-alt"></i> S2 </a></td>
                 
             </tr>
             
