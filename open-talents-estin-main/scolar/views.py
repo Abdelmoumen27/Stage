@@ -23345,3 +23345,14 @@ class MyExamenPlanningView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
 
 
 # class 
+
+from django.views.generic.base import TemplateView
+class MyExamens(TemplateView):
+    template_name = ''
+    
+    def get_context_data(self,**kwargs):
+        context = super().get_context_data(**kwargs)
+        formations = Formation.objects.filter(anneeuniv__encours = True)
+        context['formations'] = formations
+        return context        
+
