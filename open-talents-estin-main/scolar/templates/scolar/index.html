@@ -463,7 +463,7 @@
 					{% endif %}
 				{% if perms.scolar.fonctionnalitenav_examens_visualisationexamens %}
 		        	<li>
-						<a class="list-group-item" href="{% url "examen_planning" %}">{% icon 'calendar-alt' %} Planning D'Examens</a>
+						<a class="list-group-item" href="{% url 'my_examens' %}">{% icon 'calendar-alt' %} Planning D'Examens</a>
 		        	</li>
 					{% endif %}	
 				{% if perms.scolar.fonctionnalitenav_examens_visualisationsurveillance or perms.scolar.fonctionnalitenav_examens_visualisationplacesetudiants or perms.scolar.fonctionnalitenav_examens_exportatonlisteplaces %}

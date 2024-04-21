@@ -2706,3 +2706,14 @@ class EDTStartTable(tables.Table):
         model = EDTStartChoices
         # fields = ('nom', 'eps', 'prenom', 'grade', 'situation', 'tel', 'user__email', 'bureau', 'bal')
         template_name= "django_tables2/bootstrap4.html"
+
+
+
+
+class MyFormationTable(tables.Table):
+    action= '''<a href="{% url "examen_planning_drag" formation_pk=record.id %}?periode=S1" class="btn btn-primary"> <i class="fa fa-pencil-alt"></i> S1 </a>            <a href="{% url "examen_planning_drag" formation_pk=record.id %}" class="btn btn-primary"> <i class="fa fa-pencil-alt"></i> S2 </a>'''
+    edit = tables.TemplateColumn(action, orderable=False)
+    class Meta:
+        model = Formation
+        fields = ['programme', 'anneeuniv']
+        template_name= "django_tables2/bootstrap4.html"

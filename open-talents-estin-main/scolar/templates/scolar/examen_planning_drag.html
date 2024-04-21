@@ -60,14 +60,23 @@
           </tr>
         </thead>
         <tbody>
+          {% for _ in "12345678"|make_list %}
           <tr>
             <td class="row-number">Dimanche</td>
-            <td class="draggable">Value 1</td>
-            <td class="draggable">Value 2</td>
+            
+            {% for heure in horaire %}
+              {% if forloop.counter < examens|length and examens.i.heure_debut >= heure.0 and examens.i.heure_fin <= heure.1 %}
+                <td class="draggable">{{ examen.i.activite.module.matiere.titre }}</td>
+              {% else %}
+                <td class="draggable">---</td>
+              {% endif %}
+            {% endfor %}
+            <!-- <td class="draggable">Value 2</td>
             <td class="draggable">Value 3</td>
-            <td class="draggable">Value 4</td>
+            <td class="draggable">Value 4</td> -->
           </tr>
-          <tr>
+          {% endfor %}
+          <!-- <tr>
             <td class="row-number">Lundi</td>
             <td class="draggable">Value 5</td>
             <td class="draggable">Value 6</td>
@@ -94,7 +103,7 @@
             <td class="draggable">Value 17</td>
             <td class="draggable">Value 18</td>
             <td class="draggable">Value 19</td>
-          </tr>
+          </tr> -->
         </tbody>
       </table>
         

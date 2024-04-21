@@ -12110,16 +12110,16 @@ class ExamenListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         context['titre'] = "Liste des examens"
         return context
 
-class ExamenPlanningView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
-    template_name='scolar/examen_planning.html'
+# class ExamenPlanningView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+#     template_name='scolar/examen_planning.html'
     
-    def test_func(self):
-        return self.request.user.has_perm('scolar.fonctionnalitenav_examens_visualisationexamens')
-class ExamenPlanningDragView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
-    template_name='scolar/examen_planning_drag.html'
+#     def test_func(self):
+#         return self.request.user.has_perm('scolar.fonctionnalitenav_examens_visualisationexamens')
+# class ExamenPlanningDragView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+#     template_name='scolar/examen_planning_drag.html'
     
-    def test_func(self):
-        return self.request.user.has_perm('scolar.fonctionnalitenav_examens_visualisationexamens')
+#     def test_func(self):
+#         return self.request.user.has_perm('scolar.fonctionnalitenav_examens_visualisationexamens')
 
 class PlaceEtudiantListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name='scolar/filter_list.html'
@@ -23320,29 +23320,29 @@ class EDTStartListActivation(View):
     
 
 
-class MyExamenPlanningView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
-    template_name='scolar/examen_planning.html'
-    # def post(self, request):
+# class MyExamenPlanningView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+#     template_name='scolar/examen_planning.html'
+#     # def post(self, request):
 
-    def test_func(self):
-        return self.request.user.has_perm('scolar.fonctionnalitenav_examens_visualisationexamens')
+#     def test_func(self):
+#         return self.request.user.has_perm('scolar.fonctionnalitenav_examens_visualisationexamens')
     
     
-    def post(self, request):
-        seance_list = request.body['data']
-        seance_id_list =[]
-        new_dates = []
-        for seance_id, new_date in seance_list:
-            seance_id_list.append(seance_id)
-            new_dates.append(new_date)
+#     def post(self, request):
+#         seance_list = request.body['data']
+#         seance_id_list =[]
+#         new_dates = []
+#         for seance_id, new_date in seance_list:
+#             seance_id_list.append(seance_id)
+#             new_dates.append(new_date)
 
-        seances = Seance.objects.filter(id__in=seance_id_list)
-        for i in range(len(seances)):
-            seances[i].date = new_dates[i]
-            seances[i].save()
+#         seances = Seance.objects.filter(id__in=seance_id_list)
+#         for i in range(len(seances)):
+#             seances[i].date = new_dates[i]
+#             seances[i].save()
         
-        url = reverse("examen_list")
-        return redirect(url)
+#         url = reverse("examen_list")
+#         return redirect(url)
         
         
 
@@ -23352,12 +23352,70 @@ class MyExamenPlanningView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
 # class 
 
 from django.views.generic.base import TemplateView
+from scolar.tables import MyFormationTable
+from datetime import time
+
 class MyExamens(TemplateView):
-    template_name = ''
+    template_name = 'scolar/examen_planning.html'
     
     def get_context_data(self,**kwargs):
         context = super().get_context_data(**kwargs)
-        formations = Formation.objects.filter(anneeuniv__encours = True)
-        context['formations'] = formations
+        formations = Formation.objects.filter(annee_univ__encours = True)
+        formations_table = MyFormationTable(formations)
+        context['formations_table'] = formations_table
         return context        
 
+from collecions import defaultdict
+
+class ExamenPlanning(View):
+    
+    def get(self, request, formation_pk):
+        template_name = 'scolar/examen_planning_drag.html'
+        periode = request.GET['periode']
+        examens = Examen.objects.filter(Q(id_seance__activite__module__formation__id = formation_pk) and Q(seance__activite__module__periode__periode__code = periode))
+        horaires = defaultdict(dict)
+        for examen in examens:
+            if examen.horaire is not None:
+                day_key = examen.horaire.jour.strftime("%Y-%m-%d")
+                horaire_key = str(examen.horaire.heure_debut.strftime('%H:%M'))+"-"+str(examen.horaire.heure_fin.strftime('%H:%M'))
+                horaires[day_key][horaire_key] = examen
+
+        context = {
+            'horaires':horaires,
+            'examens':examens,
+            'request':request
+        }
+
+        return render(request, template_name, context)
+
+    def post(self, request, formation_pk):
+        horaires = request.POST['horaires']
+        for day, items in horaires:
+            for horaire, seance_id in items:
+                jour = datetime.strptime(day, '%Y-%m-%d')
+                heures = horaire.split('-')
+                heure_debut = datetime.strptime(heures[0], '%H:%M')
+                heure_fin = datetime.strptime(heures[1], '%H:%M')
+                try:
+                    examen = Examen.objects.get(
+                        seance__id = seance_id, 
+                        horaire__heure_debut__hour = heure_debut.hour,
+                        horaire__heure_debut__minute = heure_debut.minute,
+                        horaire__heure_debut__hour = heure_debut.hour,
+                        horaire__heure_debut__minute = heure_debut.minute,
+                        horaire__jour__year = jour.year,
+                        horaire__jour__month = jour.month,
+                        horaire__jour__day = jour.day
+                        )
+                except ObjectDoesNotExist:
+                    examen = None
+                
+
+                if examen is None:
+                    seance = Seance.object.get(id = seance_id)
+                    horaire = Horaire(jour = day, heure_debut = heure_debut, heure_fin=heure_fin)
+                    examen = Examen(seance = seance, horaire = horaire)
+                    examen.save()
+
+        redirect_url = reverse('examen_planning_drag') 
+        return redirect(redirect_url)

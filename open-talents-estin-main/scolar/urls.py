@@ -560,6 +560,8 @@ urlpatterns = [
 
     path('enseignant_edt_start_list/activation', views.EDTStartListActivation.as_view(), name='edt_start_list_activation'),
 
-    
+    path('exammen_planning/', views.MyExamens.as_view(), name='my_examens'),
+    path('exammen_planning/<int:formation_pk>/', views.ExamenPlanning.as_view(), name='examen_planning_drag'),
+
 
 ]
