@@ -7,6 +7,24 @@
 
 <style>
   
+  .draggable select {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+    background-color: #fff;
+    background-image: linear-gradient(to bottom, #f9f9f9, #e9e9e9);
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .draggable select:focus {
+    border-color: #007bff;
+    outline: 0;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+
   .table {
     margin-top: 50px;
     width: 100%; /* Adjust the width as needed */
@@ -45,58 +63,111 @@
   }
 </style>
 
+<div class="col-md-8">
+  <button id="createExamButton" class="btn btn-primary mr-2" type="button">Create Exam</button>
+  <button id="addDayButton" class="btn btn-success" data-toggle="modal" data-target="#addDayModal">Ajouter un jour</button>
+  <button id="addHorraireButton" class="btn btn-info" data-toggle="modal" data-target="#addHorraireModal">Ajouter un Horraire</button></div>
 
+<div class="modal fade" id="addDayModal" tabindex="-1" aria-labelledby="addHourModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addDayModalLabel">Ajouter un jour</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <span class="close">&times;</span>
+        <form id="addDayForm">
+          <div class="form-group">
+            <label for="datePicker">Date:</label>
+            <input type="date" class="form-control" id="date" name="date">
+          </div>
+          <button type="submit" class="btn btn-primary">Ajouter</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addHorraireModal" tabindex="-1" aria-labelledby="addHorraireModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addHorraireModalLabel">Ajouter un Horraire</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <span class="close">&times;</span>
+        <form id="addHorraireForm">
+          <div class="form-group">
+            <label for="timePicker">Heur Debut:</label>
+            <input type="time" class="form-control" id="horraireDebut" name="time">
+          </div>
+          <div class="form-group">
+            <label for="timePicker">Heur Fin:</label>
+            <input type="time" class="form-control" id="horraireFin" name="time">
+          </div>
+          <button id="addRowButton" type="submit" class="btn btn-primary">Ajouter</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="container-fluid"> <!-- Use container-fluid for full-width container -->
   
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Horraire 1</th>
-            <th>Horraire 2</th>
-            <th>Horraire 3</th>
-            <th>Horraire 4</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="row-number">Dimanche</td>
-            <td class="draggable">Value 1</td>
-            <td class="draggable">Value 2</td>
-            <td class="draggable">Value 3</td>
-            <td class="draggable">Value 4</td>
-          </tr>
-          <tr>
-            <td class="row-number">Lundi</td>
-            <td class="draggable">Value 5</td>
-            <td class="draggable">Value 6</td>
-            <td class="draggable">Value 7</td>
-            <td class="draggable">Value 8</td>
-          </tr>
-          <tr>
-            <td class="row-number">Mardi</td>
-            <td class="draggable">Value 9</td>
-            <td class="draggable">Value 10</td>
-            <td class="draggable">Value 11</td>
-            <td class="draggable">Value 12</td>
-          </tr>
-          <tr>
-            <td class="row-number">Mercredi</td>
-            <td class="draggable">Value 13</td>
-            <td class="draggable">Value 14</td>
-            <td class="draggable">Value 15</td>
-            <td class="draggable">Value 16</td>
-          </tr>
-          <tr>
-            <td class="row-number">Jeudi</td>
-            <td class="draggable">Value 16</td>
-            <td class="draggable">Value 17</td>
-            <td class="draggable">Value 18</td>
-            <td class="draggable">Value 19</td>
-          </tr>
-        </tbody>
-      </table>
+      <table id="mainTable" class="table table-bordered">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Horraire 1</th>
+        <th>Horraire 2</th>
+        <th>Horraire 3</th>
+        <th>Horraire 4</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="row-number">Dimanche</td>
+        <td class="draggable"></td>
+        <td class="draggable"></td>
+        <td class="draggable"></td>
+        <td class="draggable"></td>
+      </tr>
+      <tr>
+        <td class="row-number">Lundi</td>
+        <td class="draggable"></td>
+        <td class="draggable"></td>
+        <td class="draggable"></td>
+        <td class="draggable"></td>
+      </tr>
+      <tr>
+        <td class="row-number">Mardi</td>
+        <td class="draggable"></td>
+        <td class="draggable"></td>
+        <td class="draggable"></td>
+        <td class="draggable"></td>
+      </tr>
+      <tr>
+        <td class="row-number">Mercredi</td>
+        <td class="draggable"></td>
+        <td class="draggable"></td>
+        <td class="draggable"></td>
+        <td class="draggable"></td>
+      </tr>
+      <tr>
+        <td class="row-number">Jeudi</td>
+        <td class="draggable"></td>
+        <td class="draggable"></td>
+        <td class="draggable"></td>
+        <td class="draggable"></td>
+      </tr>
+    </tbody>
+  </table>
         
         <div >
           <a href="{{request.META.HTTP_REFERER}}" class="btn btn-secondary">Retour</a>
@@ -108,50 +179,207 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
 <script>
   $(function() {
     var isChanged = false; // Flag to track changes
+    var options = ['Value 1', 'Value 2', 'Value 3', 'Value 4', 'Value 5'];
 
-    $(".draggable").draggable({
-      revert: "invalid",
-      helper: "clone",
-      cursor: "pointer", // Ensure the cursor is set to pointer while dragging
-      drag: function(event, ui) {
-        isChanged = true; // Set the flag to true when dragging occurs
-        $(".save-button").show(); // Show the save button
+    function populateTableCells($row) {
+      $row.find('.draggable').each(function() {
+        var $cell = $(this);
+        var $text = $('<span>', { class: 'cell-text' }).text('');
+        $text.appendTo($cell);
+      });
+    }
+
+    populateTableCells($('#mainTable tbody tr'));
+
+    function initDraggableAndDroppable() {
+      $(".draggable").draggable({
+        revert: "invalid",
+        helper: "clone",
+        cursor: "pointer", // Ensure the cursor is set to pointer while dragging
+        drag: function(event, ui) {
+          isChanged = true; // Set the flag to true when dragging occurs
+          $(".save-button").show(); // Show the save button
+        }
+      });
+
+      $("td").droppable({
+        drop: function(event, ui) {
+          var draggable = ui.draggable,
+              droppable = $(this),
+              dragPos = draggable.parent().find("td").index(draggable),
+              dropPos = droppable.parent().find("td").index(droppable);
+
+          // Swap the values
+          var temp = draggable.text();
+          draggable.text(droppable.text());
+          droppable.text(temp);
+
+          isChanged = true; // Set the flag to true when dropping occurs
+          $(".save-button").show(); // Show the save button
+        }
+      });
+    }
+
+    // Call the function to initialize draggable and droppable functionality initially
+    initDraggableAndDroppable();
+
+    // AJAX request to create exam
+    $("#createExamButton").click(function() {
+      event.preventDefault();
+      $.ajax({
+        url: "{% url "examen_create2" %}",  // URL for creating exam
+        type: "GET",
+        success: function(response) {
+          // Handle successful response, maybe show a success message or perform other actions
+          // Redirect back to the original page
+          window.location.href = "{% url "examen_planning_drag" %}";
+        },
+      });
+    });
+
+    // Add row button click event
+    $(document).ready(function() {
+    // Show the popup when "Ajouter un jour" button is clicked
+    $("#addDayButton").click(function() {
+      $("#popupForm").show();
+    });
+
+    // Close the popup when the close button is clicked
+    $(".close").click(function() {
+      $("#popupForm").hide();
+    });
+
+    function getFrenchDayName(dateString) {
+      var days = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+      var date = new Date(dateString);
+      return days[date.getDay()];
+    }
+
+    // Handle form submission
+
+    $("#addDayForm").submit(function(event) {
+      event.preventDefault(); // Prevent the default form submission
+      var selectedDate = $("#date").val(); // Get the value of the selected date
+      var dayName = getFrenchDayName(selectedDate); // Get the day name
+      var columnHeader = dayName + "<br/>" + selectedDate; // Combine the day name and date
+      
+      // Add a new row to the table
+      var columnCount = $("#mainTable thead th").length; // Get the number of 
+      console.log(columnCount)
+      var newRow = "<tr><td class='row-number'>" + columnHeader + "</td>";
+      for (var i = 1; i < columnCount; i++) {
+        // For each column except the first one, append empty cells
+        newRow += "<td class='draggable'></td>";
+      }
+      newRow += "</tr>";
+      $("#mainTable tbody").append(newRow);
+      
+      // Initialize draggable and droppable functionality for newly added cells
+      initDraggableAndDroppable();
+      
+      $("#popupForm").hide(); // Hide the popup
+    });
+
+    
+  });
+
+  $(document).ready(function() {
+    // Show the popup when "Ajouter un horraire" button is clicked
+    $("#addHorraireButton").click(function() {
+      $("#popupForm").show();
+    });
+    ;
+    // Close the popup when the close button is clicked
+    $(".close").click(function() {
+      $("#popupForm").hide();
+    });
+
+    // Handle form submission
+    $("#addHorraireForm").submit(function(event) {
+      event.preventDefault(); // Prevent the default form submission
+      var horraireCount = $("#mainTable thead tr th").length;
+      var horraireDebut = $("#horraireDebut").val(); // Get the value of "Heur Debut"
+      var horraireFin = $("#horraireFin").val(); // Get the value of "Heur Fin"
+      var columnHeader = "Horraire " + horraireCount + "<br/>" + horraireDebut + " - " + horraireFin; // Combine the values
+      
+      // Add a new column to the table
+      var rowCount = $("#mainTable tbody tr").length; // Get the number of rows
+      for (var i = 0; i < rowCount+1; i++) {
+        // For each row, append a new cell to the end with empty text
+        if (i === 0) {
+          // For the first row, set the text of the first cell to the column header
+          $("#mainTable thead tr:nth-child(" + (i + 1) + ")").append("<th class='draggable'>" + columnHeader + "</th>");
+        } else {
+          // For other rows, append empty cells
+          $("#mainTable tbody tr:nth-child(" + (i) + ")").append("<td class='draggable'></td>");
+        }
+      }
+      initDraggableAndDroppable();
+      $("#popupForm").hide(); // Hide the popup
+    });
+  });
+
+
+
+
+    // Handle clicking on table cells
+    $('#mainTable').on('click', '.draggable', function(event) {
+      var $cell = $(this);
+      if (!$cell.hasClass('editing')) {
+        var $select = $('<select>');
+        $select.append($('<option>', { value: '', text: 'None' }));
+        options.forEach(function(option) {
+          $select.append($('<option>', { value: option, text: option }));
+        });
+        $cell.empty().append($select);
+        $cell.addClass('editing');
+
+        // Prevent click event from bubbling up to document click handler
+        event.stopPropagation();
       }
     });
 
-    $("td").droppable({
-      drop: function(event, ui) {
-        var draggable = ui.draggable,
-            droppable = $(this),
-            dragPos = draggable.parent().find("td").index(draggable),
-            dropPos = droppable.parent().find("td").index(droppable);
-
-        // Swap the values
-        var temp = draggable.text();
-        draggable.text(droppable.text());
-        droppable.text(temp);
-
-        isChanged = true; // Set the flag to true when dropping occurs
-        $(".save-button").show(); // Show the save button
-      }
-    });
-
-    // Save button click event
-    $(".save-button").click(function() {
-      if (isChanged) {
-        // Perform save operation here
-        alert("Changes saved!");
-        isChanged = false; // Reset the flag after saving
-        $(".save-button").hide(); // Hide the save button
+    // Apply modern styling to select elements
+    $('#mainTable').on('change', '.draggable select', function() {
+      var selectedValue = $(this).val();
+      var $cell = $(this).closest('.draggable');
+      if (selectedValue === '') {
+        // Revert cell to empty state if 'None' is selected
+        $cell.empty();
+        $cell.removeClass('editing');
       } else {
-        alert("No changes to save.");
+        // Remove selected value from the list of options
+        options = options.filter(function(option) {
+          return option !== selectedValue;
+        });
+        // Update cell text
+        $cell.text(selectedValue);
+        isChanged = true;
+        $(".save-button").show();
+        $cell.removeClass('editing');
+      }
+    });
+
+    // Handle clicking outside of table cells
+    $(document).click(function(event) {
+      var $target = $(event.target);
+      if (!$target.closest('#mainTable').length) {
+        $('.draggable.editing').each(function() {
+          var $cell = $(this);
+          // Revert cell to empty state if clicked outside
+          $cell.empty();
+          $cell.removeClass('editing');
+        });
       }
     });
   });
 </script>
+
+
 
 
 {% endblock %}
