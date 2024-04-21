@@ -12491,6 +12491,73 @@ def examen_create_view(request):
         context['form'] = form
         context['titre'] = "Planification d'un examen."
         return render(request, 'scolar/import.html', context)
+@login_required
+def examen_create_view2(request):
+    # if this is a POST request we need to process the form data
+    
+
+    if not request.user.has_perm('scolar.fonctionnalite_examens_gestionexamens'):
+        messages.error(request,"Vous n'êtes pas autorisés à accéder à cette fonction.")
+        return redirect('/accounts/login/?next=%s' % request.path)
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = ExamenCreateForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                form_data=form.cleaned_data
+                module_=form_data['module']
+                # Créer activite et seance correspondants à l'examen
+                activite_= Activite.objects.create(
+                        module=module_,
+                        type=form_data['type_activite'],
+                        vh=form_data['duree'].hour + form_data['duree'].minute/60,
+                        repeter_chaque_semaine=False,
+                    )
+                # rajouter les groupes concernés par l'examen
+                for groupe_ in form_data['groupes']:
+                    if  groupe_.code:
+                        if not groupe_ in activite_.cible.all():
+                            activite_.cible.add(groupe_)
+                    else:
+                        # Il s'agit d'une section
+                        for grpe_ in groupe_.section.groupes.all():
+                            if  not grpe_ in activite_.cible.all() and grpe_.code :
+                                activite_.cible.add(grpe_)                            
+                heure_fin_=datetime.datetime(2020, 1, 1, 0, 0) + datetime.timedelta(hours = form_data['heure_debut'].hour, minutes = form_data['heure_debut'].minute) + datetime.timedelta(hours = form_data['duree'].hour, minutes = form_data['duree'].minute) #
+                heure_fin_=heure_fin_.time()
+                
+                seance_, created = Seance.objects.update_or_create(activite=activite_, date=form_data['date'], defaults={
+                        'activite':activite_,
+                        'date': form_data['date'],
+                        'heure_debut':form_data['heure_debut'],
+                        'heure_fin':heure_fin_,
+                    })
+                
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de planification d'un examen.")
+                    HttpResponseRedirect(reverse('examen_list'))
+            messages.success(request, "L'examen a bien été planifié.")
+            if 'HTTP_X_REQUESTED_WITH' in request.META and request.META['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest':
+                return HttpResponseRedirect(reverse('examen_planning_drag'))
+            return HttpResponse()
+            
+        else:
+            context={}
+            context['form'] = form
+            context['titre'] = "Planification d'un examen."
+            return render(request, 'scolar/import.html', context)
+    else:
+        form = ExamenCreateForm()
+        messages.info(request, "Merci de renseigner le formulaire pour planifier l'examen.")
+        context={}
+        context['form'] = form
+        context['titre'] = "Planification d'un examen."
+        return render(request, 'scolar/import.html', context)
 
 @login_required
 def examen_update_view(request, seance_pk):

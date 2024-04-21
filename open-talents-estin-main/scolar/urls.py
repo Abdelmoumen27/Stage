@@ -260,6 +260,7 @@ urlpatterns = [
     re_path(r'^pv_examen_list/(?P<seance_pk>\d+)/$',views.PVExamenListView.as_view(), name='pv_examen_list'),
     re_path(r'^examen_etudiant_list/$',views.ExamenEtudiantListView.as_view(), name='examen_etudiant_list'),
     re_path(r'^examen_create/$',views.examen_create_view, name='examen_create'),
+    re_path(r'^examen_create2/$',views.examen_create_view2, name='examen_create2'),
     re_path(r'^examen_delete/(?P<pk>\d+)/$',views.ExamenDeleteView.as_view(), name='examen_delete'),
     re_path(r'^examen_update/(?P<seance_pk>\d+)/$',views.examen_update_view, name='examen_update'),
     re_path(r'^authorize_envoi_convocations_examens_enseignants/$',views.authorize_envoi_convocations_examens_enseignants_view, name='authorize_envoi_convocations_examens_enseignants'),
