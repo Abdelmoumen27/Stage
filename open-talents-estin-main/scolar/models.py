@@ -3395,15 +3395,13 @@ class ActivationInfo(models.Model):
 
 
 
-class Horaire(models.Model):
-    jour = models.DateField()
-    heure_debut = models.TimeField()
-    heure_fin = models.TimeField()
 
 
 class Examen(models.Model):
-    horaire = models.OneToOneField(Horaire, related_name='examen', on_delete=models.SET_NULL, null=True, blank=True)
-    seance = models.OneToOneField(Seance, related_name='horaire', on_delete=models.CASCADE)
+    jour = models.DateField()
+    heure_debut = models.TimeField()
+    heure_fin = models.TimeField()
+    seance = models.ForeignKey(Seance, related_name='examen',related_query_name='examen', on_delete=models.CASCADE)
 
 
 

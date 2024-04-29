@@ -1,0 +1,538 @@
+{% extends 'scolar/index.html' %}
+{% load django_tables2 crispy_forms_tags icons bootstrap4 %}
+{% bootstrap_css %} {# Embed Bootstrap CSS #}
+{% bootstrap_javascript jquery='full' %} {# Embed Bootstrap JS+jQuery #}
+{% load custom_filters %}
+{% block content %}
+
+<style>
+  .draggable select {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+    background-color: #fff;
+    background-image: linear-gradient(to bottom, #f9f9f9, #e9e9e9);
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .draggable select:focus {
+    border-color: #007bff;
+    outline: 0;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+
+  .table {
+    margin-top: 50px;
+    width: 100%;
+    /* Adjust the width as needed */
+    height: 100%;
+    justify-content: start;
+  }
+
+  .container {
+    justify-content: start;
+  }
+
+  .table th,
+  .table td {
+    text-align: center;
+  }
+
+  .draggable,
+  .droppable {
+    cursor: pointer;
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+  }
+
+  .draggable:hover,
+  .droppable:hover {
+    background-color: #007bff;
+    color: #fff;
+  }
+
+  .droppable {
+    background-color: #f8f9fa;
+    border: 2px dashed #ced4da;
+    transition: border-color 0.3s;
+  }
+
+  .droppable:hover {
+    border-color: #007bff;
+  }
+
+  .save-button {
+    margin-top: 20px;
+    display: none;
+    /* Initially hide the save button */
+  }
+</style>
+
+<div class="col-md-8">
+  <button id="createExamButton" class="btn btn-primary mr-2" type="button">Create Exam</button>
+  <button id="addDayButton" class="btn btn-success" data-toggle="modal" data-target="#addDayModal">Ajouter un
+    jour</button>
+  <button id="addHorraireButton" class="btn btn-info" data-toggle="modal" data-target="#addHorraireModal">Ajouter un
+    Horraire</button>
+</div>
+
+<div class="modal fade" id="addDayModal" tabindex="-1" aria-labelledby="addHourModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addDayModalLabel">Ajouter un jour</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <span class="close">&times;</span>
+        <form id="addDayForm">
+          <div class="form-group">
+            <label for="datePicker">Date:</label>
+            <input type="date" class="form-control" id="date" name="date">
+          </div>
+          <button id="addRowButton" type="submit" class="btn btn-primary">Ajouter</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addHorraireModal" tabindex="-1" aria-labelledby="addHorraireModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addHorraireModalLabel">Ajouter un Horraire</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <span class="close">&times;</span>
+        <form id="addHorraireForm">
+          <div class="form-group">
+            <label for="timePicker">Heur Debut:</label>
+            <input type="time" class="form-control" id="horraireDebut" name="time">
+          </div>
+          <div class="form-group">
+            <label for="timePicker">Heur Fin:</label>
+            <input type="time" class="form-control" id="horraireFin" name="time">
+          </div>
+          <button id="addColumnButton" type="submit" class="btn btn-primary">Ajouter</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid"> <!-- Use container-fluid for full-width container -->
+
+  <table id="mainTable" class="table table-bordered">
+    <thead>
+      <tr>
+        <th></th>
+        {% for hour in hours %}
+          <th>{{ hour }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      
+      {% for day in days %}
+        <tr>
+          <td class="row-number"><b><span>{{day|get_day_name}}</span><br><span>{{day}}</span></b></td>
+          {% for hour in hours %}
+            {% with key=day|add:','|add:hour %}
+              {% with examen=horaires|get_value:key %}
+                {% if examen == None %}
+                  <td class="draggable">---</td>
+                {% else %}
+                  <td id="{{ examen.seance.pk }}" class="draggable">{{ examen.seance.activite.module.matiere.code }}</td>
+                {% endif %}
+              {% endwith %}
+            {% endwith %}
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div>
+    <a href="{{request.META.HTTP_REFERER}}" class="btn btn-secondary">Retour</a>
+    <a style="color: #fff;" id="save-button" class="btn btn-primary save-button" onclick="sauvegarder()">Sauvegarder</a> <!-- Save button -->
+  </div>
+
+
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+
+
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
+
+{{ seances|json_script:'seances'}}
+
+
+<script>
+  // const dict = JSON.parse(document.getElementById('horaires').textContent)
+  // const days = JSON.parse(document.getElementById('days').textContent)
+  // const hours = JSON.parse(document.getElementById('hours').textContent)
+  // console.log(dict)
+  
+
+
+  function sendData(data) {
+      
+      // console.log(data)
+      // Create a new XMLHttpRequest object
+      var xhr = new XMLHttpRequest();
+      var csrftoken = Cookies.get('csrftoken')
+      // Configure it: GET-request for the URL /data
+      xhr.open('POST', '{{ request.path }}?periode={{request.GET.periode}}', true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      // Send the request over the network
+      s = JSON.stringify({ data: data })
+      xhr.send(s);
+
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          // Request was successful, handle response here if needed
+          console.log(xhr.responseText);
+          location.reload()
+        } else {
+          // Request failed
+          console.error('Request failed. Status: ' + xhr.status);
+        }
+      };
+    }
+
+
+    function get_tuples_from_table(){
+      //  get the table 
+      table = $('#mainTable')
+      // list = []
+      let list = []
+      header = table.find('thead tr').children()
+      lines = table.find('tbody').children()
+      // console.log(header)
+      // console.log(lines)
+      // for each line in table.body :
+      // console.log(table.find('tbody'))
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        
+        // console.log(line)
+        columns = line.children
+        // for each column in line:
+        for (let j = 1; j < columns.length; j++) {
+          let column = columns[j];
+          
+          if (column.id !== ''){
+            hour = header[j].textContent
+            jour = columns[0].children[0].children[2].textContent
+            value = parseInt(column.id)
+            list.push([jour, hour, value]) 
+          }
+        }
+      }
+      return list 
+    }
+
+
+    function get_dict_from_table(){
+      // get all tuples of the form (jour, hour, value) from the table
+      let tuples = get_tuples_from_table()
+      // console.log(tuples)
+      let dict = {}
+      for (let i = 0; i < tuples.length; i++) {
+        let tuple = tuples[i];
+        let jour = tuple[0]
+        let hour = tuple[1]
+        let value = tuple[2]
+        if (dict[jour] == undefined){
+          dict[jour]= {}
+          dict[jour][hour] = value 
+        } else {
+          dict[jour][hour] = value
+        }
+      }
+      return dict 
+    }
+      
+
+    function sauvegarder(){
+      new_dict = get_dict_from_table()
+      // console.log(new_dict)
+      sendData(new_dict)
+    }
+
+
+
+  $(function () {
+    var isChanged = false; // Flag to track changes
+    var options = JSON.parse($('#seances').text());
+    // console.log(options)
+    function populateTableCells($row) {
+      $row.find('.draggable').each(function () {
+        var $cell = $(this);
+        var $text = $('<span>', { class: 'cell-text' }).text('');
+        $text.appendTo($cell);
+      });
+    }
+
+    populateTableCells($('#mainTable tbody tr'));
+
+    function initDraggableAndDroppable() {
+      $(".draggable").draggable({
+        revert: "invalid",
+        helper: "clone",
+        cursor: "pointer", // Ensure the cursor is set to pointer while dragging
+        drag: function (event, ui) {
+          isChanged = true; // Set the flag to true when dragging occurs
+          $(".save-button").show(); // Show the save button
+        }
+      });
+
+      $("td").droppable({
+        drop: function (event, ui) {
+          var draggable = ui.draggable,
+            droppable = $(this),
+            dragPos = draggable.parent().find("td").index(draggable),
+            dropPos = droppable.parent().find("td").index(droppable);
+          
+
+            
+          // Swap the values
+          var drag_text = draggable.text();
+          var drag_id = draggable.attr('id')
+          var drop_text = droppable.text();
+          var drop_id = droppable.attr('id')
+
+          if (drag_id !== undefined & drop_id!== undefined){
+            draggable.attr('id', drop_id)
+            droppable.attr('id', drag_id)
+          }else if (drag_id !== undefined){
+            draggable.removeAttr('id')
+            droppable.attr('id', drag_id)
+          }else if (drop_id !== undefined){
+            draggable.attr('id', drop_id)
+            droppable.removeAttr('id')
+
+          }
+          
+          
+          draggable.text(drop_text)
+          droppable.text(drag_text)
+          
+
+          isChanged = true; // Set the flag to true when dropping occurs
+          $(".save-button").show(); // Show the save button
+        }
+      });
+    }
+
+    // Call the function to initialize draggable and droppable functionality initially
+    initDraggableAndDroppable();
+
+    // AJAX request to create exam
+    $("#createExamButton").click(function () {
+      event.preventDefault();
+      // console.log('hello')
+      $.ajax({
+        url: "{% url 'examen_create' %}",  // URL for creating exam
+        type: "GET",
+        success: function (response) {
+          // Handle successful response, maybe show a success message or perform other actions
+          console.log(response)
+
+          // Redirect back to the original page
+          // window.location.href = "";
+        },
+      });
+    });
+
+    // Add row button click event
+    $(document).ready(function () {
+      // Show the popup when "Ajouter un jour" button is clicked
+      $("#addDayButton").click(function () {
+        $("#popupForm").show();
+      });
+
+      // Close the popup when the close button is clicked
+      $(".close").click(function () {
+        $("#popupForm").hide();
+      });
+
+      function getFrenchDayName(dateString) {
+        var days = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+        var date = new Date(dateString);
+        return days[date.getDay()];
+      }
+
+      // Handle form submission
+
+      $("#addDayForm").submit(function (event) {
+        event.preventDefault(); // Prevent the default form submission
+        var selectedDate = $("#date").val(); // Get the value of the selected date
+        var dayName = getFrenchDayName(selectedDate); // Get the day name
+        var columnHeader = '<b>'+'<span>'+dayName+'</span>' + "<br/>" + '<span>' + selectedDate + '</span>'+ '</b>'; // Combine the day name and date
+
+        // Add a new row to the table
+        var columnCount = $("#mainTable thead th").length; // Get the number of 
+        console.log(columnCount)
+        var newRow = "<tr><td class='row-number'>" + columnHeader + "</td>";
+        for (var i = 1; i < columnCount; i++) {
+          // For each column except the first one, append empty cells
+          newRow += "<td class='draggable'>---</td>";
+        }
+        newRow += "</tr>";
+        $("#mainTable tbody").append(newRow);
+
+        // Initialize draggable and droppable functionality for newly added cells
+        initDraggableAndDroppable();
+
+        $("#popupForm").hide(); // Hide the popup
+      });
+
+
+    });
+
+    $(document).ready(function () {
+      // Show the popup when "Ajouter un horraire" button is clicked
+      $("#addHorraireButton").click(function () {
+        $("#popupForm").show();
+      });
+      ;
+      // Close the popup when the close button is clicked
+      $(".close").click(function () {
+        $("#popupForm").hide();
+
+      });
+
+      // Handle form submission
+      $("#addHorraireForm").submit(function (event) {
+        event.preventDefault(); // Prevent the default form submission
+        var horraireCount = $("#mainTable thead tr th").length;
+        var horraireDebut = $("#horraireDebut").val(); // Get the value of "Heur Debut"
+        var horraireFin = $("#horraireFin").val(); // Get the value of "Heur Fin"
+        var columnHeader = horraireDebut + "-" + horraireFin; // Combine the values
+
+        // Add a new column to the table
+        var rowCount = $("#mainTable tbody tr").length; // Get the number of rows
+        for (var i = 0; i < rowCount + 1; i++) {
+          // For each row, append a new cell to the end with empty text
+          if (i === 0) {
+            // For the first row, set the text of the first cell to the column header
+            $("#mainTable thead tr:nth-child(" + (i + 1) + ")").append("<th>" + columnHeader + "</th>");
+          } else {
+            // For other rows, append empty cells
+            $("#mainTable tbody tr:nth-child(" + (i) + ")").append("<td class='draggable'>---</td>");
+          }
+        }
+        initDraggableAndDroppable();
+        $("#popupForm").hide(); // Hide the popup
+      });
+    });
+
+
+
+    var beforeChangeValue; 
+    var beforeChangeText ;
+
+    // Handle clicking on table cells
+    $('#mainTable').on('click', '.draggable', function (event) {
+      var $cell = $(this);
+      if (!$cell.hasClass('editing')) {
+        beforeChangeText = $cell.text()
+        beforeChangeValue = $cell.attr('id')
+
+        var $select = $('<select>');
+        $select.append($('<option>', { value: '', text: 'None' }));
+        options.forEach(function (option) {
+          // console.log(option)
+          $select.append($('<option>', { value:option['pk'], text: option['matiere'] }));
+        });
+        $cell.empty().append($select);
+        $cell.addClass('editing');
+
+        // Prevent click event from bubbling up to document click handler
+        event.stopPropagation();
+      }
+    });
+    console.log(beforeChangeText)
+    console.log(beforeChangeValue)
+    // Apply modern styling to select elements
+    $('#mainTable').on('change', '.draggable select', function () {
+      var selectedValue = $(this).val();
+      var selectedText = $(this).find('option:selected').text();
+      var $cell = $(this).closest('.draggable');
+
+      if (selectedValue === '') {
+        // Revert cell to empty state if 'None' is selected
+        
+        options.push({"pk":beforeChangeValue, "matiere":beforeChangeText})
+        $cell.empty();
+        $cell.removeClass('editing');
+        $cell.text('---')
+        $cell.removeAttr('id')
+      } else {
+        // Remove selected value from the list of options
+        options = options.filter(function (option, index) {
+          // console.log(option, selectedValue)
+          return parseInt(option['pk']) !== parseInt(selectedValue);
+        });
+        // Update cell text
+        $cell.text(selectedText);
+        $cell.attr('id', selectedValue)
+        console.log(beforeChangeValue, beforeChangeText)
+        if (beforeChangeValue !== undefined){
+          options.push({ "pk": beforeChangeValue, "matiere": beforeChangeText })
+        }
+        isChanged = true;
+        $(".save-button").show();
+        $cell.removeClass('editing');
+      }
+    });
+
+    // Handle clicking outside of table cells
+    $(document).click(function (event) {
+      var $target = $(event.target);
+      if (!$target.closest('#mainTable').length) {
+        $('.draggable.editing').each(function () {
+          var $cell = $(this);
+          text = $cell.text()
+          id = $cell.attr('value')
+          var foundOpt = options.find(function (opt) {
+            return opt['pk'] === beforeChangeValue 
+          });
+          if (beforeChangeValue !== undefined & !foundOpt){
+            options.push({ "pk": beforeChangeValue, "matiere": beforeChangeText })
+          }
+          $cell.empty();
+          $cell.removeClass('editing');
+          $cell.text('---')
+          $cell.removeAttr('id')
+        });
+      }
+    });
+  });
+</script>
+
+
+
+
+{% endblock %}

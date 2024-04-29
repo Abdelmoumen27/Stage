@@ -76,3 +76,5 @@ admin.site.register(InscriptionPeriode)
 # stage register
 admin.site.register(EDTStartChoices)
 admin.site.register(ActivationInfo)
+admin.site.register(Examen)
+

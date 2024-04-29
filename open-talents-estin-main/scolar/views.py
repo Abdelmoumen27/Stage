@@ -12542,8 +12542,8 @@ def examen_create_view2(request):
                     messages.error(request, "ERREUR: lors de planification d'un examen.")
                     HttpResponseRedirect(reverse('examen_list'))
             messages.success(request, "L'examen a bien été planifié.")
-            if 'HTTP_X_REQUESTED_WITH' in request.META and request.META['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest':
-                return HttpResponseRedirect(reverse('examen_planning_drag'))
+            # if 'HTTP_X_REQUESTED_WITH' in request.META and request.META['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest':
+            #     return HttpResponseRedirect(reverse('examen_planning_drag'))
             return HttpResponse()
             
         else:
@@ -23420,7 +23420,8 @@ class EDTStartListActivation(View):
 
 from django.views.generic.base import TemplateView
 from scolar.tables import MyFormationTable
-from datetime import time
+from datetime import datetime
+import json
 
 class MyExamens(TemplateView):
     template_name = 'scolar/examen_planning.html'
@@ -23432,57 +23433,103 @@ class MyExamens(TemplateView):
         context['formations_table'] = formations_table
         return context        
 
-from collecions import defaultdict
+from collections import defaultdict
+from django.core import serializers
+
+# def get_examen_dict(examen):
+#     d=  {}
+#     d['pk'] = examen.id
+
+#     d['seance'] = {
+#         'pk':examen.seance.id,
+#         'matiere':examen.seance.activite.module.matiere.code
+#     }
+#     return d
+
+
+def get_seance_repr(seances):
+    S = []
+    for seance in seances:
+        d = {'pk':seance.id, 'matiere':seance.activite.module.matiere.code }
+        S.append(d)
+    
+    return S
+
+
+
+
+# def get_value(examen, keys):
+#     d = examen
+#     for key in keys:
+#         item = d.get(key, None)
+#         if item is None:
+#             return None
+#         d = item
+    
+#     return d
 
 class ExamenPlanning(View):
     
     def get(self, request, formation_pk):
         template_name = 'scolar/examen_planning_drag.html'
         periode = request.GET['periode']
-        examens = Examen.objects.filter(Q(id_seance__activite__module__formation__id = formation_pk) and Q(seance__activite__module__periode__periode__code = periode))
+        examens = Examen.objects.filter(Q(seance__activite__module__formation__id = formation_pk) and Q(seance__activite__module__periode__periode__code = periode))
         horaires = defaultdict(dict)
+        days = []
+        hours = []
+        seance_ids = set()
         for examen in examens:
-            if examen.horaire is not None:
-                day_key = examen.horaire.jour.strftime("%Y-%m-%d")
-                horaire_key = str(examen.horaire.heure_debut.strftime('%H:%M'))+"-"+str(examen.horaire.heure_fin.strftime('%H:%M'))
-                horaires[day_key][horaire_key] = examen
+            day_key = examen.jour.strftime("%Y-%m-%d")
+            horaire_key = str(examen.heure_debut.strftime('%H:%M'))+"-"+str(examen.heure_fin.strftime('%H:%M'))
+            horaires[day_key][horaire_key] = examen
+            days.append(day_key)
+            hours.append(horaire_key)
+            seance_ids.add(examen.seance.id)
+        
+        days = sorted(list(set(days)))
+        hours = sorted(list(set(hours)))
+
+        seances = Seance.objects.filter(Q(activite__module__formation__id = formation_pk) and Q(activite__module__periode__periode__code = periode)).exclude(id__in=seance_ids)
+        
+        seances = get_seance_repr(seances)
+        # print(seances)
 
         context = {
             'horaires':horaires,
-            'examens':examens,
+            'seances':seances,
+            'days':days,
+            'hours':hours,
             'request':request
         }
 
         return render(request, template_name, context)
 
     def post(self, request, formation_pk):
-        horaires = request.POST['horaires']
-        for day, items in horaires:
-            for horaire, seance_id in items:
+        periode = request.GET['periode']
+        data = json.loads(request.body)
+        # print(horaires)
+        planning = data['data']
+        for day, horaire in planning.items():
+            for heure, seance_pk in horaire.items():
                 jour = datetime.strptime(day, '%Y-%m-%d')
-                heures = horaire.split('-')
+                heures = heure.split('-')
                 heure_debut = datetime.strptime(heures[0], '%H:%M')
                 heure_fin = datetime.strptime(heures[1], '%H:%M')
-                try:
-                    examen = Examen.objects.get(
-                        seance__id = seance_id, 
-                        horaire__heure_debut__hour = heure_debut.hour,
-                        horaire__heure_debut__minute = heure_debut.minute,
-                        horaire__heure_debut__hour = heure_debut.hour,
-                        horaire__heure_debut__minute = heure_debut.minute,
-                        horaire__jour__year = jour.year,
-                        horaire__jour__month = jour.month,
-                        horaire__jour__day = jour.day
-                        )
-                except ObjectDoesNotExist:
-                    examen = None
-                
 
-                if examen is None:
-                    seance = Seance.object.get(id = seance_id)
-                    horaire = Horaire(jour = day, heure_debut = heure_debut, heure_fin=heure_fin)
-                    examen = Examen(seance = seance, horaire = horaire)
-                    examen.save()
+                seance = Seance.objects.get(id= seance_pk)
+                examens = seance.examen.all()
+                if len(examens) == 0:
+                    examen = Examen(seance=seance)
+                else:
+                    examen = examens[0]
+                examen.jour = jour
+                examen.heure_debut = heure_debut
+                examen.heure_fin = heure_fin
+                examen.save()
 
-        redirect_url = reverse('examen_planning_drag') 
+        redirect_url = reverse('examen_planning_drag', args=[formation_pk])+'?periode='+str(periode) 
         return redirect(redirect_url)
+
+
+
+
